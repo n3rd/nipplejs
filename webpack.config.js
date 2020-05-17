@@ -1,23 +1,32 @@
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-const DEBUG = process.env.NODE_ENV !== 'production';
 const NAME = 'nipplejs';
 
-module.exports = {
+module.exports = env => { return {
     context: __dirname,
     entry: './src/index.js',
-    mode: DEBUG ? 'development' : 'production',
+    mode: env !== 'production' ? 'development' : 'production',
     devServer:{
         contentBase: __dirname,
         publicPath: '/dist/',
         port: 9000,
     },
+	optimization: {
+		minimizer: [new UglifyJsPlugin({
+		  uglifyOptions: {
+		  output: {
+			comments: false,
+			max_line_len: 100
+		  }}
+		})],
+	},
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: `${NAME}.js`,
         library: NAME,
         libraryExport: 'default',
-        libraryTarget: 'umd',
+        libraryTarget: 'window',
         umdNamedDefine: true
     },
     module: {
@@ -32,4 +41,5 @@ module.exports = {
             },
         ]
     }
+}
 };
